@@ -12,17 +12,17 @@ element.setAttribute('id','formular');
 containerElm.append(h1Elm, element, pElm);
 
 element.innerHTML = `
-    <!--<div class="form__field">
+    <div class="form__field">
         <label class="form__label" for="question">Vyberte otázku</label>
         <select id="question" class="form__input"></select>
-    </div>-->
+    </div>
     <div class="form__field">
         <label class="form__label" for="answer">Vyberte odpověď</label>
         <select id="answer" class="form__input"></select>
     </div>
     <div class="form__field">
-        <label class="form__label">Jméno hlasujícího:</label>
-        <input class="form__input" type="text" id="voter" name="voter" required>
+        <label class="form__label">Vaše jméno</label>
+        <input class="form__input" type="text" id="voter" name="voter" size="12" required>
     </div>
     <input class="form__button" type="submit" value="Poslat hlas">
     `;
@@ -30,27 +30,46 @@ element.innerHTML = `
 const voterElm = element.querySelector('#voter');
 const zpravaElm = document.querySelector('#zprava');
 
-fetch('https://apps.kodim.cz/daweb/hlasovani/api/poll/1')
+const questionElm = element.querySelector('#question');
+const answerElm = element.querySelector('#answer');
+
+fetch('https://apps.kodim.cz/daweb/hlasovani/api/polls')
 .then(response => response.json())
 .then(data => {
-    data.poll.options.map(oneOption => {
-        const answerElm = element.querySelector('#answer');
-        answerElm.innerHTML += `<option value="${oneOption.id}">${oneOption.text}</option>`;
+    data.results.map(oneResult => {
+        questionElm.innerHTML += `<option value="${oneResult.id}">${oneResult.question}</option>`;
     })
 });
 
-const answerElm = element.querySelector('#answer');
-console.log(answerElm.value);
+fetch('https://apps.kodim.cz/daweb/hlasovani/api/poll/0')
+    .then(response => response.json())
+    .then(data => {
+        data.poll.options.map(oneOption => {
+            answerElm.innerHTML += `<option value="${oneOption.id}">${oneOption.text}</option>`;
+    })
+});
+
+questionElm.addEventListener('change', (event) => {
+    answerElm.innerHTML = '';
+
+    fetch(`https://apps.kodim.cz/daweb/hlasovani/api/poll/${event.target.value}`)
+    .then(response => response.json())
+    .then(data => {
+        data.poll.options.map(oneOption => {
+            answerElm.innerHTML += `<option value="${oneOption.id}">${oneOption.text}</option>`;
+    })
+});
+})
 
 const sendVote = (event) => {
     event.preventDefault();
 
     const objectVote = {
-        optionId: 1,
+        optionId: Number(answerElm.value),
         voterName: voterElm.value
     }
 
-    fetch('https://apps.kodim.cz/daweb/hlasovani/api/poll/1', {
+    fetch(`https://apps.kodim.cz/daweb/hlasovani/api/poll/${Number(questionElm.value)}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -59,11 +78,28 @@ const sendVote = (event) => {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.status === 'error') {
+        if (voterElm.value.length > 12 ) {
+            zpravaElm.innerHTML = `<span class="error">Max. délka jména je 12 znaků 💁‍♀️</span>`;
+        } else if (data.status === 'error') {
             zpravaElm.innerHTML = `<span class="error">Nelze hlasovat dvakrát se stejným jménem 😪</span>`;
         } else {
             zpravaElm.innerHTML = `<span class="sucess">Váš hlas byl odeslán 🤗</span>`;
             voterElm.value = '';
+            fetch('https://apps.kodim.cz/daweb/hlasovani/api/polls')
+            .then(response => response.json())
+            .then(data => {
+                data.results.map(oneResult => {
+                    questionElm.innerHTML += `<option value="${oneResult.id}">${oneResult.question}</option>`;
+                })
+            });
+
+            fetch('https://apps.kodim.cz/daweb/hlasovani/api/poll/0')
+                .then(response => response.json())
+                .then(data => {
+                    data.poll.options.map(oneOption => {
+                        answerElm.innerHTML += `<option value="${oneOption.id}">${oneOption.text}</option>`;
+                })
+            });
         }
     });
 }
