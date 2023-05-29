@@ -4,13 +4,21 @@
 }
 
 html {
-  font-family: sans-serif;
+  font-family: "PT Sans", sans-serif;
+  background-color: #f8f9fa;
+  color: #2d1f16;
+  font-size: 1rem;
+}
+
+h1 {
+  margin-top: 0;
 }
 
 .container {
-  max-width: 31.25rem;
   margin-right: auto;
   margin-left: auto;
+  padding: 1.25rem;
+  max-width: 31.25rem;
 }
 
 .form__field + .form__field {
@@ -21,12 +29,19 @@ html {
   margin-bottom: 0.3125rem;
   display: block;
   color: gray;
-  font-size: 18px;
+  font-size: 1.125rem;
 }
 
 .form__input {
-  border: 1px solid gray;
-  font-size: 18px;
+  padding: 0.3125rem;
+  border: 1px solid #808080;
+  font-family: "PT Sans", sans-serif;
+  font-size: 1.125rem;
+}
+
+.form__input:focus {
+  outline: none;
+  box-shadow: 0 0 0 1px gray;
 }
 
 .form__button {
@@ -36,7 +51,8 @@ html {
 	border-radius: 5px;
 	background-color: #13529e;
 	color: white;
-  font-size: 16px;
+  font-family: "PT Sans", sans-serif;
+  font-size: 1rem;
 	text-transform: uppercase;
 }
 
@@ -45,13 +61,13 @@ html {
 }
 
 .sucess {
-  font-size: 18px;
+  font-size: 1.125rem;
 	color: #008000;
   font-weight: bold;
 }
 
 .error {
-  font-size: 18px;
+  font-size: 1.125rem;
 	color: #ff0000;
   font-weight: bold;
 }

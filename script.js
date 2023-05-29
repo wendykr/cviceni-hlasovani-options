@@ -85,6 +85,8 @@ const sendVote = (event) => {
         } else {
             zpravaElm.innerHTML = `<span class="sucess">Váš hlas byl odeslán 🤗</span>`;
             voterElm.value = '';
+            questionElm.innerHTML = '';
+            answerElm.innerHTML = '';
             fetch('https://apps.kodim.cz/daweb/hlasovani/api/polls')
             .then(response => response.json())
             .then(data => {
